@@ -86,17 +86,19 @@ app.use("/api/stats", statRoutes);
 // Serve frontend in production
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../../frontend/dist");
+  console.log("Serving frontend from:", frontendPath);
 
   if (fs.existsSync(frontendPath)) {
     app.use(express.static(frontendPath));
 
     app.get("*", (req, res) => {
-      res.sendFile(path.join(frontendPath, "index.html"));
+      res.sendFile(path.resolve(frontendPath, "index.html"));
     });
   } else {
     console.warn("⚠️ Frontend build folder not found:", frontendPath);
   }
 }
+
 
 
 // error handler
