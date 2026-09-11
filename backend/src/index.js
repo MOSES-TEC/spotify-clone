@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 
 import { initializeSocket } from './lib/socket.js';
 import { connectDB } from './lib/db.js';
+import job from "./lib/cron.js";
 
 import userRoutes from './routes/user.route.js';
 import adminRoutes from './routes/admin.route.js';
@@ -45,6 +46,12 @@ app.use(cors({
 
 app.use(express.json()); // to parse req.body 
 app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
+
+app.get("/health", (req, res) => {
+    res.status(200).json({ message: "Server is healthy" });
+});
+
+
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: path.join(__dirname, "tmp"),
@@ -109,9 +116,10 @@ app.use((err, req, res, next) => {
 httpServer.listen(PORT, () => {
     console.log("🚀 Server is running on port " + PORT);
     connectDB();
+
+	if(process.env.NODE_ENV === "production") job.start();
 });
 
 
-// socket.io implementation
 
 
